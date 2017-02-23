@@ -1,0 +1,72 @@
+appName: youdrive-api
+appUrl: http://localhost:8080
+
+#Dropwizard specific configs
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      target: stderr
+    - type: file
+      currentLogFilename: ./logs/youdrive-api.log
+      archivedLogFilenamePattern: ./logs/youdrive-api-%d.log.gz
+      archivedFileCount: 5
+      timeZone: UTC
+
+server:
+  type: simple
+  applicationContextPath: /youdrive/api/v1
+  adminContextPath: /youdrive/admin
+  connector:
+    type: http
+    port: 8080
+
+database:
+  # the name of your JDBC driver
+  driverClass: com.mysql.jdbc.Driver
+  # the username
+  user: root
+  # the password
+  password: 1234
+  # the JDBC URL
+  url: jdbc:mysql://localhost:3306/youdrive-api
+  # any properties specific to your JDBC driver:
+  properties:
+    charSet: UTF-8
+  # the maximum amount of time to wait on an empty pool before throwing an exception
+  maxWaitForConnection: 1s
+  # the SQL query to run when validating a connection's liveness
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  # the minimum number of connections to keep open
+  minSize: 8
+  # the maximum number of connections to keep open
+  maxSize: 32
+  # whether or not idle connections should be validated
+  checkConnectionWhileIdle: true
+  # Whether or not connections will be validated before being borrowed from the pool. If the connection fails to validate, it will be dropped from the pool, and another will be borrowed.
+  checkConnectionOnBorrow: true
+  # the amount of time to sleep between runs of the idle connection validation, abandoned cleaner and idle pool resizing
+  evictionInterval: 10s
+  # the minimum amount of time an connection must sit idle in the pool before it is eligible for eviction
+  minIdleTime: 1 minute
+
+jerseyClient:
+  # dropwizard overrides jersey client settings
+  timeout: 500ms
+  connectionTimeout: 500ms
+  timeToLive: 1h
+  cookiesEnabled: false
+  maxConnections: 1024
+  maxConnectionsPerRoute: 1024
+  keepAlive: 0ms
+  retries: 0
+  gzipEnabledForRequests: false
+
+oAuth2:
+  oAuth2ServerUrl: http://localhost:8090
+  oAuth2RegisterClientPath: admin/resourceServer/101/client
+  oAuth2TokenInfo: v1/tokeninfo
+  # admin token from accesstoken table (expires should be 0)
+  bearerToken: b441fe73-deb2-4b88-ba35-a7828693ba59
+  useRefreshTokens: true
+  expireDuration: 28800
