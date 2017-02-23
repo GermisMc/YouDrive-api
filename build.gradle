@@ -1,0 +1,52 @@
+group 'by.youdrive'
+version '0.1-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+// The main class of the application
+mainClassName = 'by.youdrive.YouDriveApiApplication'
+
+project.ext {
+    dropwizardVersion = '1.0.5'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'io.dropwizard:dropwizard-core:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-assets:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-jersey:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-db:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-migrations:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-jdbi:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-auth:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-client:' + dropwizardVersion
+    compile 'com.hubspot.dropwizard:dropwizard-guice:1.0.0.2'
+    compile 'org.slf4j:slf4j-api:1.7.22'
+    compile 'org.liquibase:liquibase-core:3.5.3'
+    compile 'org.jetbrains:annotations:15.0'
+
+    runtime 'mysql:mysql-connector-java:5.1.40'
+
+    // test
+    testCompile 'junit:junit:4.12'
+    testCompile 'io.dropwizard:dropwizard-client:' + dropwizardVersion
+    testCompile 'io.dropwizard:dropwizard-testing:' + dropwizardVersion
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
+}
+
+run {
+    if (System.getProperty("exec.args") != null) {
+        args System.getProperty("exec.args").split()
+    }
+}
