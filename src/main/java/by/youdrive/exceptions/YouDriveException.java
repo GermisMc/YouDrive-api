@@ -8,6 +8,7 @@ public class YouDriveException extends RuntimeException {
     static public final int WrongDateOrDateFormat = 1004;
     static public final int WrongArgument = 1005;
     static public final int CannotCreateOAuthClient = 1006;
+    static public final int CannotGetOAuthToken = 1007;
 
     private int status = 0;
 

@@ -12,4 +12,5 @@ public class Messages {
     static public final String ContentType_ContentTypeIsNotAllowed = "%s content type is not allowed";
     static public final String ContentIsNotOf_ContentType_Type = "Content is not of %s type";
     static public final String CannotCreateOAuthClient = "failed to create user";
+    static public final String CannotGetOAuthToken = "failed to get client token from oAuth2 server";
 }

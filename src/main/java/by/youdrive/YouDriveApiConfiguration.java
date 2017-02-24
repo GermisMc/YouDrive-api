@@ -68,8 +68,11 @@ public class YouDriveApiConfiguration extends Configuration {
         private int expireDuration;
         private String oAuth2ServerUrl;
         private String oAuth2RegisterClientPath;
+        private String oAuth2TokenPath;
         private String oAuth2TokenInfo;
         private String bearerToken;
+        private String authToken;
+        private String refreshToken;
 
         public String getBearerToken() {
             return bearerToken;
@@ -83,6 +86,10 @@ public class YouDriveApiConfiguration extends Configuration {
             return oAuth2RegisterClientPath;
         }
 
+        public String getoAuth2TokenPath() {
+            return oAuth2TokenPath;
+        }
+
         public String getoAuth2TokenInfo() {
             return oAuth2TokenInfo;
         }
@@ -94,6 +101,14 @@ public class YouDriveApiConfiguration extends Configuration {
 
         public int getExpireDuration() {
             return expireDuration;
+        }
+
+        public String getAuthToken() {
+            return authToken;
+        }
+
+        public String getRefreshToken() {
+            return refreshToken;
         }
     }
 }
