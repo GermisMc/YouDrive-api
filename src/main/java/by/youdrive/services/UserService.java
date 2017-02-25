@@ -1,17 +1,24 @@
 package by.youdrive.services;
 
+import by.youdrive.YouDriveApiConfiguration;
+import by.youdrive.commons.OA2TokenResp;
 import by.youdrive.domain.ID;
 import by.youdrive.domain.JSON;
 import by.youdrive.domain.UserEntity;
 import by.youdrive.jdbi.YouDriveDAO;
 import com.google.inject.Inject;
 
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import java.util.*;
 
 public class UserService {
 
     @Inject
     private YouDriveDAO dao;
+
+    @Inject
+    private YouDriveApiConfiguration configuration;
 
     public UserEntity registerNewUser(String firstName, String lastName, UserEntity.Contacts contacts, boolean admin, Locale locale,
                                       String secret, Object customProperties) {
@@ -55,7 +62,7 @@ public class UserService {
     }
 
     public Optional<UserEntity> findByEmail(String email) {
-        return Optional.ofNullable(dao.userDAO().findByEmail(email));
+        return Optional.ofNullable(dao.userDAO().findByEmail("%" + email + "%"));
     }
 
     public List<UserEntity> getAll() {
@@ -64,5 +71,17 @@ public class UserService {
 
     public void deleteUser(UserEntity entity) {
         dao.userDAO().deleteById(entity.getId());
+    }
+
+    public Response.ResponseBuilder setAuthCookies(Response.ResponseBuilder builder, OA2TokenResp tokenResp) {
+        YouDriveApiConfiguration.OAuth2Config oAuth2Config = configuration.getoAuth2Config();
+
+        builder.cookie(new NewCookie(oAuth2Config.getAuthToken(), tokenResp.getAccessToken()));
+
+        if (tokenResp.getRefreshToken() != null) {
+            builder.cookie(new NewCookie(oAuth2Config.getRefreshToken(), tokenResp.getRefreshToken()));
+        }
+
+        return builder;
     }
 }

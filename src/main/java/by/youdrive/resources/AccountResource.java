@@ -1,26 +1,30 @@
 package by.youdrive.resources;
 
 import by.youdrive.YouDriveApiConfiguration;
+import by.youdrive.commons.ErrorMessages;
 import by.youdrive.commons.OA2ClientResp;
 import by.youdrive.commons.OA2TokenResp;
 import by.youdrive.commons.User;
 import by.youdrive.domain.UserEntity;
+import by.youdrive.exceptions.Messages;
 import by.youdrive.exceptions.YouDriveException;
 import by.youdrive.mappers.UserMapper;
 import by.youdrive.services.HttpService;
 import by.youdrive.services.UserService;
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
 
 @Path("/account")
 public class AccountResource {
+
+    static private Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
     @Context
     UriInfo uriInfo;
@@ -36,6 +40,26 @@ public class AccountResource {
 
     @Inject
     private YouDriveApiConfiguration configuration;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAccount(@NotNull @HeaderParam("user-email") String email) {
+        Response.ResponseBuilder response = Response.status(Response.Status.OK);
+
+        UserEntity userEntity = userService.findByEmail(email).orElseThrow(() -> new WebApplicationException(
+                Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessages(Messages.NoResourceFound)).build()));
+
+        try {
+            OA2TokenResp tokenResp = httpService.getToken(userEntity.getId(), userEntity.getSecret());
+            response = userService.setAuthCookies(response, tokenResp);
+        }
+        catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            throw new YouDriveException(e);
+        }
+
+        return response.build();
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -54,14 +78,12 @@ public class AccountResource {
             userService.updateUser(userEntity, secret);
 
             OA2TokenResp tokenResp = httpService.getToken(userEntity.getId(), secret);
-            response.cookie(new NewCookie(oAuth2Config.getAuthToken(), tokenResp.getAccessToken()));
-
-            if (tokenResp.getRefreshToken() != null) {
-                response.cookie(new NewCookie(oAuth2Config.getRefreshToken(), tokenResp.getRefreshToken()));
-            }
+            response = userService.setAuthCookies(response, tokenResp);
         }
         catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
             userService.deleteUser(userEntity);
+            logger.info("User removed", userEntity);
             throw new YouDriveException(e);
         }
 

@@ -26,7 +26,7 @@ public interface UserDAO {
     @SqlQuery("select * from user where id = :id")
     UserEntity findById(@Bind("id") ID id);
 
-    @SqlQuery("select * from user where contacts like '%:email%'")
+    @SqlQuery("select * from user where contacts like :email")
     UserEntity findByEmail(@Bind("email") String email);
 
     @SqlUpdate("insert into user (id, first_name, last_name, contacts, admin, locale, secret, custom_properties) values " +
