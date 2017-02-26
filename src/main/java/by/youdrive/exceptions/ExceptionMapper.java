@@ -23,6 +23,7 @@ public class ExceptionMapper implements javax.ws.rs.ext.ExceptionMapper<Exceptio
         put(YouDriveException.WrongArgument, Response.Status.BAD_REQUEST);
         put(YouDriveException.WrongDateOrDateFormat, Response.Status.BAD_REQUEST);
         put(YouDriveException.CannotCreateOAuthClient, Response.Status.INTERNAL_SERVER_ERROR);
+        put(YouDriveException.CannotGetOAuthToken, Response.Status.NOT_FOUND);
     }};
 
     @Override

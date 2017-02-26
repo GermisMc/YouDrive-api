@@ -27,7 +27,7 @@ public class YouDriveApiApplication extends Application<YouDriveApiConfiguration
     @Override
     public void run(YouDriveApiConfiguration configuration, Environment environment) throws Exception {
         environment.jersey().register(new AuthDynamicFeature(
-                new YouDriverAuthFilter.Builder<UserEntity>()
+                new YouDriverAuthFilter.Builder<UserEntity>(configuration)
                 .setAuthenticator(guiceBundle.getInjector().getInstance(YouDriveAuthenticator.class))
                 .setAuthorizer(new YouDriveAuthorizer())
                 .setPrefix("Bearer")

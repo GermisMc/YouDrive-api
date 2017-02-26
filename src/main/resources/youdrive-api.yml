@@ -69,7 +69,8 @@ oAuth2:
   oAuth2TokenInfo: v1/tokeninfo
   # admin token from accesstoken table (expires should be 0)
   bearerToken: b441fe73-deb2-4b88-ba35-a7828693ba59
-  useRefreshTokens: true
+  base64: MTc0ZjNhYWMtMGRjOC00OWU3LWJmZmMtY2M2ZjE3ODQyN2IxOjJjYmVjM2JiLTg4MzctNDliZC1iYzBmLWQzNWNhMjk1MDVjMQ==
+  useRefreshTokens: false
   expireDuration: 28800
   authToken: auth-token
   refreshToken: refresh-token

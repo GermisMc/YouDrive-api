@@ -1,16 +1,15 @@
 package by.youdrive.services;
 
 import by.youdrive.YouDriveApiConfiguration;
-import by.youdrive.commons.OA2TokenResp;
 import by.youdrive.domain.ID;
 import by.youdrive.domain.JSON;
 import by.youdrive.domain.UserEntity;
 import by.youdrive.jdbi.YouDriveDAO;
 import com.google.inject.Inject;
 
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 public class UserService {
 
@@ -71,17 +70,5 @@ public class UserService {
 
     public void deleteUser(UserEntity entity) {
         dao.userDAO().deleteById(entity.getId());
-    }
-
-    public Response.ResponseBuilder setAuthCookies(Response.ResponseBuilder builder, OA2TokenResp tokenResp) {
-        YouDriveApiConfiguration.OAuth2Config oAuth2Config = configuration.getoAuth2Config();
-
-        builder.cookie(new NewCookie(oAuth2Config.getAuthToken(), tokenResp.getAccessToken()));
-
-        if (tokenResp.getRefreshToken() != null) {
-            builder.cookie(new NewCookie(oAuth2Config.getRefreshToken(), tokenResp.getRefreshToken()));
-        }
-
-        return builder;
     }
 }

@@ -71,11 +71,16 @@ public class YouDriveApiConfiguration extends Configuration {
         private String oAuth2TokenPath;
         private String oAuth2TokenInfo;
         private String bearerToken;
+        private String base64;
         private String authToken;
         private String refreshToken;
 
         public String getBearerToken() {
             return bearerToken;
+        }
+
+        public String getBase64() {
+            return base64;
         }
 
         public String getoAuth2ServerUrl() {
