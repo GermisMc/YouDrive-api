@@ -1,10 +1,7 @@
 package by.youdrive.resources;
 
 import by.youdrive.YouDriveApiConfiguration;
-import by.youdrive.commons.ErrorMessages;
-import by.youdrive.commons.OA2ClientResp;
-import by.youdrive.commons.OA2TokenResp;
-import by.youdrive.commons.User;
+import by.youdrive.commons.*;
 import by.youdrive.domain.UserEntity;
 import by.youdrive.exceptions.Messages;
 import by.youdrive.exceptions.YouDriveException;
@@ -20,7 +17,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.util.List;
+import java.util.Locale;
 
 @Path("/account")
 public class AccountResource {
@@ -44,7 +41,7 @@ public class AccountResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAccount(@NotNull @HeaderParam("user-email") String email) {
+    public Response getAccount(@NotNull @HeaderParam("user-email") String email) { // TODO input third-party token from cookie
         OA2TokenResp tokenResp;
         YouDriveApiConfiguration.OAuth2Config oAuth2Config = configuration.getoAuth2Config();
 
@@ -59,7 +56,7 @@ public class AccountResource {
             throw new YouDriveException(e);
         }
 
-        User foundUser = userMapper.fromEntity(uriInfo, userEntity);
+        User foundUser = userMapper.fromEntityToResponse(uriInfo, userEntity);
         if (tokenResp.getRefreshToken() != null) {
             foundUser.setRefreshToken(tokenResp.getRefreshToken());
         }
@@ -74,17 +71,19 @@ public class AccountResource {
         OA2TokenResp tokenResp;
         YouDriveApiConfiguration.OAuth2Config oAuth2Config = configuration.getoAuth2Config();
 
+        Locale locale = user.getLocale() == null ? null : Locale.forLanguageTag(user.getLocale());
+
         UserEntity userEntity = userService.registerNewUser(user.getFirstName(), user.getLastName(),
-                user.getContacts(), false, null, "", null);
+                user.getContacts(), false, locale, "", user.getCustomProperties());
         try {
 
             OA2ClientResp clientResp = httpService.registerClientInOAuth2(userEntity.getId(), userEntity.getName(),
                     userEntity.getContacts().getEmails().get(0), null);
 
             String secret = clientResp.getSecret();
-            userService.updateUser(userEntity, secret);
+            userEntity = userService.updateUser(userEntity, secret);
 
-            tokenResp = httpService.getToken(userEntity.getId(), secret);
+            tokenResp = httpService.getToken(userEntity.getId(), userEntity.getSecret());
         }
         catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
@@ -93,10 +92,7 @@ public class AccountResource {
             throw new YouDriveException(e);
         }
 
-        // for debug only
-        List<UserEntity> entities = userService.getAll();
-        UserEntity entity = entities.get(0);
-        User createdUser = userMapper.fromEntity(uriInfo, entity);
+        User createdUser = userMapper.fromEntityToResponse(uriInfo, userEntity);
 
         if (tokenResp.getRefreshToken() != null) {
             createdUser.setRefreshToken(tokenResp.getRefreshToken());
@@ -121,10 +117,10 @@ public class AccountResource {
             throw new YouDriveException(e);
         }
 
-        User user = new User();
-        user.setRefreshToken(tokenResp.getRefreshToken());
+        OA2Token refreshToken = new OA2Token();
+        refreshToken.setRefreshToken(tokenResp.getRefreshToken());
 
         return Response.status(Response.Status.OK).cookie(new NewCookie(
-                oAuth2Config.getAuthToken(), tokenResp.getAccessToken())).entity(user).build();
+                oAuth2Config.getAuthToken(), tokenResp.getAccessToken())).entity(refreshToken).build();
     }
 }

@@ -18,6 +18,7 @@ public class User extends ResourceRepresentation {
     private UserEntity.Contacts contacts;
     private String locale;
     private String refreshToken;
+    private Object customProperties;
 
     public String getId() {
         return id;
@@ -43,6 +44,10 @@ public class User extends ResourceRepresentation {
         return refreshToken;
     }
 
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -65,5 +70,9 @@ public class User extends ResourceRepresentation {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 }
