@@ -41,6 +41,16 @@ dependencies {
     testCompile 'io.dropwizard:dropwizard-testing:' + dropwizardVersion
 }
 
+distributions {
+    main {
+        contents {
+            from ('src/main/resources') {
+                include "*.yml"
+            }
+        }
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.3'
 }
